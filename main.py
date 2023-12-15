@@ -19,7 +19,8 @@ except Exception as e:
     print(f"An error occurred: {e}")
 
 
-default_max = 20
+default_fields = [Gmaps.Fields.NAME, Gmaps.Fields.EMAILS,
+                  Gmaps.Fields.ADDRESS, Gmaps.Fields.ADDRESS]
 
 
 def jump_lines(count=2):
@@ -61,10 +62,9 @@ def get_user_number_input(prompt="Type some text then hit ENTER (type 'done' to 
 def scrape_data(queries, **other_config_options):
     # run the scrape fucntion given api key and config
     if (other_config_options):
-        Gmaps.places(queries, fields={
-                     Gmaps.ALL_FIELDS}, **other_config_options)
+        Gmaps.places(queries, fields=default_fields, **other_config_options)
     else:
-        Gmaps.places(queries, fields={Gmaps.ALL_FIELDS})
+        Gmaps.places(queries, fields=default_fields)
 
 
 def save_to_csv(data, output_file='output.csv'):
@@ -103,21 +103,22 @@ if __name__ == "__main__":
     max = get_user_number_input("how many records (all)")
     jump_lines()
 
-    # should_scrape_socials = get_user_input(
-    #     "should we scrape for socials E-Mail etc.\n yes/no (no)")
-    # jump_lines()
+    should_scrape_socials = get_user_input(
+        "should we scrape for socials E-Mail etc.\n yes/no (no)")
+    jump_lines()
 
-    # if (should_scrape_socials == "yes"):
-    #     YOUR_API_KEY = get_user_input(
-    #         "Aiit then, Enter yourr RapiApi key")
-    #     other_config["key"] = YOUR_API_KEY
-    #     jump_lines()
+    if (should_scrape_socials == "yes"):
+        YOUR_API_KEY = get_user_input(
+            "Aiit then, Enter yourr RapiApi key")
+        other_config["key"] = YOUR_API_KEY
+        jump_lines()
 
     if (max == ""):
-        results = scrape_data(queries, **other_config)
+        results = scrape_data(queries)
     else:
+        other_config["max"] = max
         results = scrape_data(
-            queries, max=max, default_max=100000, **other_config)
+            queries,  **other_config)
 
     if results:
         print("QUERIES:")
