@@ -4,6 +4,7 @@ from botasaurus import bt
 
 import os
 import shutil
+love_it_star_it = '''Love It? Star It! ⭐ https://github.com/omkarcloud/google-maps-scraper/'''
 
 try:
     # Try to get the path using shutil

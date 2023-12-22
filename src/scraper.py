@@ -1,4 +1,3 @@
-import traceback
 from botasaurus import *
 from botasaurus.cache import DontCache
 from src.extract_data import extract_data
@@ -118,6 +117,7 @@ def scrape_place(requests: AntiDetectRequests, link):
             
             return cleaned  
         except:
+            print(f'Failed to scrape place: {link}. Retrying after a minute.')
             sleep(63)
             raise
 
@@ -149,11 +149,22 @@ def scrape_places_by_links(driver: AntiDetectDriver, data):
     scrape_place_obj.put(links)
     places = scrape_place_obj.get()
 
+    hasnone = False
+    for place in places:
+      if place is None:
+        hasnone = True
+        break
+    
+    places = bt.remove_nones(places)
+
     sponsored_links = []
     places = merge_sponsored_links(places, sponsored_links)
 
     if convert_to_english:
         places = convert_unicode_dict_to_ascii_dict(places)
+
+    if hasnone:
+        return DontCache(places)
 
     return places 
 
@@ -269,6 +280,15 @@ def scrape_places(driver: AntiDetectDriver, data):
 
     places = scrape_place_obj.get()
 
+    hasnone = False
+    for place in places:
+      if place is None:
+        hasnone = True
+        break
+    
+    places = bt.remove_nones(places)
+
+
     sponsored_links = get_sponsored_links() 
     places = merge_sponsored_links(places, sponsored_links)
     
@@ -278,7 +298,11 @@ def scrape_places(driver: AntiDetectDriver, data):
     result = {"query": data['query'], "places": places}
     
     if failed_to_scroll:
-        DontCache(result)
+        return DontCache(result)
+
+    if hasnone:
+        return DontCache(result)
+
     return result 
 
 if __name__ == "__main__":
